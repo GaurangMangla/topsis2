@@ -8,7 +8,6 @@ This repository contains a comprehensive implementation of the *Technique for Or
 
 As part of the assignment's final stage, a web service was developed to provide a graphical user interface for the TOPSIS algorithm.
 
-![TOPSIS Web Service Interface](image_eda025.png)
 
 *Features shown in the screenshot:*
 •⁠  ⁠*File Upload:* Accepts ⁠ .csv ⁠ files containing numeric data.
@@ -17,6 +16,9 @@ As part of the assignment's final stage, a web service was developed to provide 
 •⁠  ⁠*Status Indicators:* Success messages confirming the processing and email delivery.
 
 ---
+DEPLOYED WEBSITE
+
+https://topsis2-omega.vercel.app/
 
 ## 🛠️ Project Workflow & Methodology
 
@@ -91,3 +93,5 @@ The alternatives are ranked based on $P_i$ values in descending order. The highe
 ### Command Line
 ```bash
 python <program.py> <InputDataFile> <Weights> <Impacts> <OutputResultFileName>
+
+
