@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TOPSIS - Technique for Order of Preference by Similarity to Ideal Solution. Upload your data and get ranked results via email.">
+    <title>TOPSIS Web Service | Decision Analysis Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .logo p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            font-weight: 300;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .hint {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.75rem;
+            font-weight: 400;
+            margin-top: 4px;
+        }
+
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: block;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-display {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .file-input-wrapper:hover .file-input-display {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .file-input-display.has-file {
+            border-color: #10b981;
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .file-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .submit-btn .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+        }
+
+        .submit-btn.loading .spinner {
+            display: inline-block;
+        }
+
+        .submit-btn.loading .btn-text {
+            opacity: 0.8;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: none;
+            font-size: 0.9rem;
+        }
+
+        .alert.success {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+            display: block;
+        }
+
+        .alert.error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            display: block;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 32px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .divider span {
+            padding: 0 16px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.8rem;
+        }
+
+        .info-box {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .info-box h3 {
+            color: #667eea;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .info-box ul {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+            padding-left: 20px;
+        }
+
+        .info-box li {
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 24px;
+            }
+
+            .logo h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="logo">
+                <h1>TOPSIS</h1>
+                <p>Multi-Criteria Decision Analysis</p>
+            </div>
+
+            <div id="alert" class="alert"></div>
+
+            <form id="topsisForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="file">Input File (CSV)</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="file" name="file" accept=".csv" required>
+                        <div class="file-input-display" id="fileDisplay">
+                            <svg class="file-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                            </svg>
+                            <span id="fileName">Choose a CSV file or drag here</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="weights">Weights</label>
+                    <input type="text" id="weights" name="weights" placeholder="e.g., 1,1,1,1" required>
+                    <p class="hint">Comma-separated values matching criteria columns</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="impacts">Impacts</label>
+                    <input type="text" id="impacts" name="impacts" placeholder="e.g., +,+,-,+" required>
+                    <p class="hint">Use + for benefit criteria, - for cost criteria</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                    <p class="hint">Results will be sent to this email</p>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span class="spinner"></span>
+                    <span class="btn-text">Submit</span>
+                </button>
+            </form>
+
+            <div class="divider"><span>Instructions</span></div>
+
+            <div class="info-box">
+                <h3>📋 Requirements</h3>
+                <ul>
+                    <li>CSV file with at least 3 columns</li>
+                    <li>First column: Object names</li>
+                    <li>Remaining columns: Numeric criteria</li>
+                    <li>Weights & impacts count must match criteria</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('topsisForm');
+        const fileInput = document.getElementById('file');
+        const fileDisplay = document.getElementById('fileDisplay');
+        const fileName = document.getElementById('fileName');
+        const alert = document.getElementById('alert');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // File input display update
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                fileName.textContent = this.files[0].name;
+                fileDisplay.classList.add('has-file');
+            } else {
+                fileName.textContent = 'Choose a CSV file or drag here';
+                fileDisplay.classList.remove('has-file');
+            }
+        });
+
+        // Form validation
+        function validateForm() {
+            const weights = document.getElementById('weights').value.trim();
+            const impacts = document.getElementById('impacts').value.trim();
+            const email = document.getElementById('email').value.trim();
+
+            // Validate weights format
+            const weightsArr = weights.split(',').map(w => w.trim());
+            for (const w of weightsArr) {
+                if (isNaN(parseFloat(w))) {
+                    showAlert('Weights must be comma-separated numbers', 'error');
+                    return false;
+                }
+            }
+
+            // Validate impacts format
+            const impactsArr = impacts.split(',').map(i => i.trim());
+            for (const i of impactsArr) {
+                if (i !== '+' && i !== '-') {
+                    showAlert('Impacts must be + or - separated by commas', 'error');
+                    return false;
+                }
+            }
+
+            // Validate counts match
+            if (weightsArr.length !== impactsArr.length) {
+                showAlert('Number of weights must equal number of impacts', 'error');
+                return false;
+            }
+
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showAlert('Please enter a valid email address', 'error');
+                return false;
+            }
+
+            return true;
+        }
+
+        function showAlert(message, type) {
+            alert.textContent = message;
+            alert.className = 'alert ' + type;
+        }
+
+        function hideAlert() {
+            alert.className = 'alert';
+        }
+
+        // Form submission
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            hideAlert();
+
+            if (!validateForm()) {
+                return;
+            }
+
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('/api/topsis', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showAlert('✓ ' + result.message, 'success');
+                    form.reset();
+                    fileName.textContent = 'Choose a CSV file or drag here';
+                    fileDisplay.classList.remove('has-file');
+                } else {
+                    showAlert('✗ ' + (result.error || 'An error occurred'), 'error');
+                }
+            } catch (error) {
+                showAlert('✗ Network error. Please try again.', 'error');
+            } finally {
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
